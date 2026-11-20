@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Search and download lecture presentations.">
+  <title>DeckFinder</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <header class="top"><a class="brand" href="/">DeckFinder</a><div id="account"></div></header>
+  <main>
+    <div class="intro">
+      <p class="eyebrow">LECTURE LIBRARY</p>
+      <h1>Find the slide<br>you remember.</h1>
+      <p>Search lecture decks by topic, term, or a question in your own words.</p>
+    </div>
+    <nav id="tabs" hidden aria-label="Workspace">
+      <button type="button" data-view="search" aria-pressed="true">Search decks</button>
+      <button type="button" data-view="teacher" aria-pressed="false">Teacher workspace</button>
+    </nav>
+    <p id="notice" role="status" aria-live="polite"></p>
+    <section id="search">
+      <form id="search-form" class="search-bar">
+        <label class="sr" for="query">Search lecture decks</label>
+        <input id="query" name="q" required maxlength="300" placeholder="How does a load balancer work?">
+        <button>Search</button>
+      </form>
+      <div id="results" class="cards"></div>
+    </section>
+    <section id="teacher" hidden>
+      <div class="work">
+        <form id="upload" class="panel">
+          <h2>Upload a PowerPoint</h2>
+          <label>Deck title <input name="title" required maxlength="160"></label>
+          <label>Course <input name="course" maxlength="100"></label>
+          <label>PowerPoint file <input name="file" type="file" accept=".pptx" required></label>
+          <button>Upload and publish</button>
+        </form>
+        <div class="panel">
+          <div class="row"><h2>Your decks</h2><button type="button" id="refresh" class="secondary">Refresh</button></div>
+          <div id="library" class="cards"></div>
+        </div>
+      </div>
+      <form id="editor" class="panel editor">
+        <div class="row"><h2>Slide editor</h2><button type="button" id="new-draft" class="secondary">New draft</button></div>
+        <div class="work">
+          <label>Deck title <input name="title" required maxlength="160"></label>
+          <label>Course <input name="course" maxlength="100"></label>
+        </div>
+        <div id="slides"></div>
+        <div class="actions">
+          <button type="button" id="add-slide" class="secondary">Add slide</button>
+          <button type="submit" class="secondary">Save draft</button>
+          <button type="submit" value="publish">Publish deck</button>
+        </div>
+      </form>
+    </section>
+  </main>
+</body>
+</html>

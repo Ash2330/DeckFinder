@@ -1,0 +1,14 @@
+{$DECKFINDER_HOST} {
+    handle /api/* {
+        request_body {
+            max_size 27MB
+        }
+        reverse_proxy api:8000
+    }
+    handle {
+        reverse_proxy api:8000
+    }
+    header X-Content-Type-Options "nosniff"
+    header Referrer-Policy "no-referrer"
+    header Content-Security-Policy "default-src 'self'; connect-src 'self' https://*.amazoncognito.com; img-src 'self' data:; base-uri 'none'; frame-ancestors 'none'; form-action 'self'"
+}

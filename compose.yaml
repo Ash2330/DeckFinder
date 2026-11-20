@@ -1,0 +1,63 @@
+x-app: &app
+  image: deckfinder-app:local
+  pull_policy: never
+  env_file: ${DECKFINDER_ENV_FILE:-.env}
+  init: true
+  logging:
+    options:
+      max-size: "10m"
+      max-file: "3"
+
+services:
+  solr:
+    image: solr:9.7
+    command: ["solr-precreate", "decks"]
+    volumes:
+      - solr-data:/var/solr
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8983/solr/decks/admin/ping"]
+      interval: 5s
+      timeout: 4s
+      retries: 20
+  schema:
+    <<: *app
+    command: ["python", "-m", "deckfinder.search"]
+    depends_on:
+      solr:
+        condition: service_healthy
+  api:
+    <<: *app
+    build: .
+    environment:
+      OMP_NUM_THREADS: ${API_EMBEDDING_THREADS:-2}
+      MKL_NUM_THREADS: ${API_EMBEDDING_THREADS:-2}
+    restart: unless-stopped
+    depends_on:
+      schema:
+        condition: service_completed_successfully
+  worker:
+    <<: *app
+    command: ["python", "-m", "deckfinder.worker"]
+    environment:
+      OMP_NUM_THREADS: ${WORKER_EMBEDDING_THREADS:-1}
+      MKL_NUM_THREADS: ${WORKER_EMBEDDING_THREADS:-1}
+    restart: unless-stopped
+    depends_on:
+      schema:
+        condition: service_completed_successfully
+  gateway:
+    image: caddy:2
+    environment:
+      DECKFINDER_HOST: ${DECKFINDER_HOST:-localhost}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+    restart: unless-stopped
+
+volumes:
+  solr-data:
+  caddy-data:
